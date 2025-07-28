@@ -1,77 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>AmicusIA</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('', filename='styles.css') }}" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmicusIA</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="container">
-        <h2>AmicusIA 💬<br><span>Tu amigo emocional</span></h2>
-        <textarea id="mensaje" rows="5" placeholder="Cuéntame cómo te sientes..."></textarea>
-        <button onclick="enviarMensaje()">Enviar</button>
-        <div id="respuesta-box">
-            <strong>Respuesta:</strong>
-            <p id="respuesta"></p>
-        </div>
+  <div class="container">
+    <h2>AmicusIA<br><span>Tu amigo emocional</span></h2>
+    <textarea id="mensaje" rows="5" placeholder="Cuéntame cómo te sientes..."></textarea>
+    <button onclick="enviarMensaje()">Enviar</button>
+    <div id="respuesta-box">
+      <strong>Respuesta:</strong>
+      <p id="respuesta"></p>
     </div>
-
-    <script>
-async function enviarMensaje() {
-    const mensajeInput = document.getElementById("mensaje");
-    const respuestaOutput = document.getElementById("respuesta");
-    const button = document.querySelector("button");
-    
-    try {
-        // Validación básica
-        if (!mensajeInput.value.trim()) {
-            respuestaOutput.innerText = "Por favor escribe un mensaje";
-            return;
-        }
-
-        // Estado de carga
-        button.disabled = true;
-        respuestaOutput.innerText = "Pensando...";
-
-        // 1. Detectar emoción
-        const emocionRes = await fetch('/api/emocion', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mensaje: mensajeInput.value })
-        });
-        
-        if (!emocionRes.ok) {
-            throw new Error(`Error HTTP: ${emocionRes.status}`);
-        }
-        const emocionData = await emocionRes.json();
-
-        const botchatRes = await fetch('/api/botchat', {  
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                mensaje: mensajeInput.value,
-                emocion: emocionData.emocion || 'neutral'
-            })
-        });
-        
-        if (!botchatRes.ok) {
-            const errorDetails = await botchatRes.json().catch(() => ({}));
-            throw new Error(errorDetails.error || `Error: ${botchatRes.status}`);
-        }
-        
-        const botchatData = await botchatRes.json();
-        respuestaOutput.innerText = botchatData.respuesta || "No recibí respuesta";
-        
-    } catch (error) {
-        console.error("Error completo:", error);
-        respuestaOutput.innerText = `Error: ${error.message}`;
-    } finally {
-        button.disabled = false;
-        mensajeInput.value = ""; 
-    }
-}
-    </script>
-</body>
+ </body>
 </html>
